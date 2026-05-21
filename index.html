@@ -33,7 +33,6 @@ body{
   color:var(--text);
   min-height:100vh;
   display:flex;
-  flex-direction: column;
 }
 
 .sidebar{
@@ -493,7 +492,24 @@ body{
 }
 
 .category-block{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-radius:30px;
+  padding:26px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.18);
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-radius:30px;
+  padding:26px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.18);
+
   margin-bottom:38px;
+overflow:hidden;
+overflow:hidden;
 }
 
 .category-title{
@@ -681,9 +697,10 @@ body{
 </style>
 
 <script>
-const tools = [
+let tools = JSON.parse(localStorage.getItem('aihub_tools')) || [
 {name:'ChatGPT',url:'https://chat.openai.com/chat',category:'Chat IA',tags:['LLM','Multimodal','Productividad'],description:'Asistente multimodal generalista para razonamiento, programación, automatización, análisis y creación de contenido.'},
-{name:'Claude',url:'https://claude.ai/new',category:'Chat IA',tags:['Texto','Documentos','Análisis'],description:'Especializado en análisis de documentos largos, PDFs, escritura avanzada y razonamiento estructurado.'},
+{name:'Claude',url:'https://claude.ai/new',category:'Desarrollo',tags:['LLM','Coding','Artifacts','Reasoning'],description:'Modelo frontier especialmente fuerte en programación, razonamiento avanzado y análisis de documentos extensos.'},
+{name:'Claude Code',url:'https://www.anthropic.com/claude-code',category:'Desarrollo',tags:['CLI','Coding','Agentic'],description:'Entorno agentic de Claude para programación desde terminal y workflows avanzados de ingeniería.'},
 {name:'Perplexity',url:'https://www.perplexity.ai/',category:'Investigación',tags:['Buscar','Research','Web'],description:'Motor de respuestas IA orientado a investigación con referencias y navegación web integrada.'},
 {name:'DeepSeek',url:'https://www.deepseek.com/',category:'Desarrollo',tags:['Código','LLM','Reasoning'],description:'Modelo IA muy fuerte en programación, razonamiento lógico y tareas técnicas.'},
 {name:'Blackbox',url:'https://www.blackbox.ai/',category:'Desarrollo',tags:['Código','IDE','Developer'],description:'Asistente de programación con búsqueda de código y generación contextual.'},
@@ -727,6 +744,8 @@ const tools = [
 {name:'v0 Chat',url:'https://v0.dev/chat',category:'Desarrollo',tags:['Frontend','Chat UI'],description:'Entorno conversacional de v0 para generación iterativa de interfaces.'}
 ];
 
+let draggedIndex = null;
+
 let currentFilter = 'Todos';
 let editIndex = null;
 
@@ -750,6 +769,7 @@ function renderFilters(){
 
 function setFilter(tag){
  currentFilter = tag;
+ persist();
  renderFilters();
  renderCategories();
 }
@@ -775,9 +795,9 @@ function renderCategories(){
 
    block.innerHTML=`
      <h2 class="category-title">${category}</h2>
-     <div class="apps-grid">
+     <div class="apps-grid" data-category="${category}">
        ${filtered.map(tool=>`
-         <a class="app-card" href="${tool.url}" target="_blank">
+         <a class="app-card" draggable="true" ondragstart="dragStart(event, ${tools.indexOf(tool)})" ondragover="allowDrop(event)" ondrop="dropCard(event, '${category}')" href="${tool.url}" target="_blank">
            <div class="tooltip">
              <h4>${tool.name}</h4>
              <p>${tool.description}</p>
@@ -800,6 +820,8 @@ function renderCategories(){
  });
 
  renderAdminList();
+ persist();
+ persist();
 }
 
 function toggleAdminPanel(){
@@ -838,6 +860,14 @@ function editTool(index){
  document.getElementById('toolDescription').value=tool.description;
 }
 
+function persist(){
+ localStorage.setItem('aihub_tools', JSON.stringify(tools));
+}
+
+function persist(){
+ localStorage.setItem('aihub_tools', JSON.stringify(tools));
+}
+
 function saveTool(){
  const tool={
    name:document.getElementById('toolName').value,
@@ -853,6 +883,8 @@ function saveTool(){
    tools[editIndex]=tool;
  }
 
+ persist();
+
  editIndex=null;
  renderFilters();
  renderCategories();
@@ -860,11 +892,30 @@ function saveTool(){
 
 function deleteTool(index){
  tools.splice(index,1);
+ persist();
+ persist();
  renderFilters();
  renderCategories();
 }
 
 document.getElementById('search').addEventListener('input', renderCategories);
+
+function dragStart(event,index){
+ draggedIndex=index;
+}
+
+function allowDrop(event){
+ event.preventDefault();
+}
+
+function dropCard(event,newCategory){
+ event.preventDefault();
+ if(draggedIndex===null) return;
+ tools[draggedIndex].category = newCategory;
+ persist();
+ renderCategories();
+ renderFilters();
+}
 
 renderFilters();
 renderCategories();
