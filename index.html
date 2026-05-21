@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AI Hub OS</title>
+<!-- ACTUALIZADO: tarjetas compactas, todas las URLs incluidas, filtros por etiquetas, edición y eliminación -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -323,299 +324,417 @@ body{
 </head>
 <body>
 
-<aside class="sidebar">
-  <div class="logo">
-    <div class="logo-icon">AI</div>
-    <div>
-      <h1>AI Hub OS</h1>
-      <p>Knowledge & Tool System</p>
+<div class="app-container">
+  <aside class="sidebar">
+    <h1>AI Hub OS</h1>
+    <p class="sidebar-subtitle">Dashboard personal de herramientas IA</p>
+
+    <input type="text" id="searchInput" placeholder="Buscar herramientas..." class="search-input">
+
+    <div class="filter-title">Etiquetas</div>
+    <div class="tag-filters" id="tagFilters"></div>
+
+    <button class="add-btn" onclick="openAddModal()">+ Añadir herramienta</button>
+  </aside>
+
+  <main class="main-content">
+    <div class="cards-grid" id="cardsGrid"></div>
+  </main>
+</div>
+
+<div class="modal" id="toolModal">
+  <div class="modal-content">
+    <h2 id="modalTitle">Nueva herramienta</h2>
+
+    <input id="toolName" placeholder="Nombre">
+    <input id="toolUrl" placeholder="URL">
+    <input id="toolTag" placeholder="Etiqueta">
+    <textarea id="toolDesc" placeholder="Descripción"></textarea>
+
+    <div class="modal-actions">
+      <button onclick="saveTool()">Guardar</button>
+      <button onclick="closeModal()">Cancelar</button>
     </div>
   </div>
+</div>
 
-  <div class="menu">
-    <button class="active" onclick="filterCategory('all')">Todos</button>
-    <button onclick="filterCategory('llm')">LLMs</button>
-    <button onclick="filterCategory('dev')">Desarrollo</button>
-    <button onclick="filterCategory('image')">Imagen/Vídeo</button>
-    <button onclick="filterCategory('audio')">Audio</button>
-    <button onclick="filterCategory('writing')">Texto</button>
-    <button onclick="showFavorites()">Favoritos ⭐</button>
-  </div>
-</aside>
+<style>
+body{
+  margin:0;
+  background:#0f172a;
+  color:white;
+  font-family:Inter,sans-serif;
+}
 
-<main class="main">
+.app-container{
+  display:flex;
+  min-height:100vh;
+}
 
-  <div class="topbar">
-    <input type="text" id="searchInput" class="search" placeholder="Buscar herramientas, tags o funcionalidades...">
+.sidebar{
+  width:300px;
+  background:#111827;
+  padding:24px;
+  border-right:1px solid #1f2937;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:auto;
+}
 
-    <div class="stats">
-      <div class="stat-card">
-        <h3>22</h3>
-        <p>Herramientas</p>
-      </div>
+.sidebar h1{
+  margin-bottom:6px;
+}
 
-      <div class="stat-card">
-        <h3>7</h3>
-        <p>Categorías</p>
-      </div>
+.sidebar-subtitle{
+  color:#94a3b8;
+  margin-bottom:24px;
+  font-size:14px;
+}
 
-      <div class="stat-card">
-        <h3 id="favCount">0</h3>
-        <p>Favoritos</p>
-      </div>
-    </div>
-  </div>
+.search-input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background:#1e293b;
+  color:white;
+  margin-bottom:24px;
+}
 
-  <section class="section">
-    <div class="section-header">
-      <h2>Herramientas IA</h2>
-    </div>
+.filter-title{
+  margin-bottom:10px;
+  color:#cbd5e1;
+  font-size:14px;
+}
 
-    <div class="grid" id="cardsContainer">
+.tag-filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:24px;
+}
 
-      <div class="card" data-category="llm">
-        <div class="card-top">
-          <div class="app">
-            <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=128">
-            <div class="app-info">
-              <h3>ChatGPT</h3>
-              <span>LLM · Multimodal</span>
-            </div>
-          </div>
-          <div class="favorite" onclick="toggleFavorite(this)">★</div>
-        </div>
+.tag-filter{
+  padding:8px 12px;
+  border-radius:999px;
+  background:#1e293b;
+  cursor:pointer;
+  font-size:12px;
+}
 
-        <div class="desc">
-          Plataforma generalista para razonamiento, programación, automatización, análisis y creación multimodal.
-        </div>
+.tag-filter.active{
+  background:#2563eb;
+}
 
-        <div class="tags">
-          <span class="tag">reasoning</span>
-          <span class="tag">coding</span>
-          <span class="tag">multimodal</span>
-        </div>
+.add-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-        <div class="card-actions">
-          <a class="btn btn-primary" href="https://chat.openai.com/chat" target="_blank">Abrir</a>
-          <a class="btn btn-secondary" href="https://openai.com" target="_blank">Sitio</a>
-        </div>
+.main-content{
+  flex:1;
+  padding:24px;
+}
 
-        <div class="notes">
-          <textarea placeholder="Notas personales..."></textarea>
-        </div>
-      </div>
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:16px;
+}
 
-      <div class="card" data-category="llm">
-        <div class="card-top">
-          <div class="app">
-            <img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=128">
-            <div class="app-info">
-              <h3>Claude</h3>
-              <span>Writing · Research</span>
-            </div>
-          </div>
-          <div class="favorite" onclick="toggleFavorite(this)">★</div>
-        </div>
+.card{
+  background:#111827;
+  border:1px solid #1f2937;
+  border-radius:18px;
+  padding:16px;
+  transition:0.2s;
+}
 
-        <div class="desc">
-          Excelente para documentos largos, PDFs, síntesis avanzada y razonamiento estructurado.
-        </div>
+.card:hover{
+  transform:translateY(-2px);
+  border-color:#3b82f6;
+}
 
-        <div class="tags">
-          <span class="tag">documents</span>
-          <span class="tag">analysis</span>
-          <span class="tag">writing</span>
-        </div>
+.card-top{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
 
-        <div class="card-actions">
-          <a class="btn btn-primary" href="https://claude.ai/new" target="_blank">Abrir</a>
-          <a class="btn btn-secondary" href="https://claude.ai" target="_blank">Sitio</a>
-        </div>
+.card-top img{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+}
 
-        <div class="notes">
-          <textarea placeholder="Notas personales..."></textarea>
-        </div>
-      </div>
+.card h3{
+  margin:0;
+  font-size:16px;
+}
 
-      <div class="card" data-category="dev">
-        <div class="card-top">
-          <div class="app">
-            <img src="https://www.google.com/s2/favicons?domain=v0.dev&sz=128">
-            <div class="app-info">
-              <h3>v0</h3>
-              <span>Frontend · UI</span>
-            </div>
-          </div>
-          <div class="favorite" onclick="toggleFavorite(this)">★</div>
-        </div>
+.card p{
+  color:#cbd5e1;
+  font-size:13px;
+  line-height:1.45;
+  min-height:58px;
+}
 
-        <div class="desc">
-          Generador IA de interfaces React y Tailwind para prototipado frontend rápido.
-        </div>
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:12px 0;
+}
 
-        <div class="tags">
-          <span class="tag">react</span>
-          <span class="tag">tailwind</span>
-          <span class="tag">frontend</span>
-        </div>
+.tag{
+  background:#1e293b;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:11px;
+  color:#93c5fd;
+}
 
-        <div class="card-actions">
-          <a class="btn btn-primary" href="https://v0.dev" target="_blank">Abrir</a>
-          <a class="btn btn-secondary" href="https://v0.dev/chat" target="_blank">Chat</a>
-        </div>
+.card-actions{
+  display:flex;
+  gap:8px;
+}
 
-        <div class="notes">
-          <textarea placeholder="Notas personales..."></textarea>
-        </div>
-      </div>
+.card-actions button,
+.card-actions a{
+  flex:1;
+  text-align:center;
+  border:none;
+  border-radius:10px;
+  padding:10px;
+  text-decoration:none;
+  cursor:pointer;
+  font-size:13px;
+}
 
-      <div class="card" data-category="image">
-        <div class="card-top">
-          <div class="app">
-            <img src="https://www.google.com/s2/favicons?domain=krea.ai&sz=128">
-            <div class="app-info">
-              <h3>Krea</h3>
-              <span>Image Generation</span>
-            </div>
-          </div>
-          <div class="favorite" onclick="toggleFavorite(this)">★</div>
-        </div>
+.open-btn{
+  background:#2563eb;
+  color:white;
+}
 
-        <div class="desc">
-          Plataforma avanzada para generación visual, upscale y diseño IA en tiempo real.
-        </div>
+.edit-btn{
+  background:#1e293b;
+  color:white;
+}
 
-        <div class="tags">
-          <span class="tag">image</span>
-          <span class="tag">design</span>
-          <span class="tag">creative</span>
-        </div>
+.delete-btn{
+  background:#7f1d1d;
+  color:white;
+}
 
-        <div class="card-actions">
-          <a class="btn btn-primary" href="https://www.krea.ai/home" target="_blank">Abrir</a>
-          <a class="btn btn-secondary" href="https://www.krea.ai/home" target="_blank">Sitio</a>
-        </div>
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
 
-        <div class="notes">
-          <textarea placeholder="Notas personales..."></textarea>
-        </div>
-      </div>
+.modal-content{
+  width:400px;
+  background:#111827;
+  padding:24px;
+  border-radius:18px;
+}
 
-      <div class="card" data-category="audio">
-        <div class="card-top">
-          <div class="app">
-            <img src="https://www.google.com/s2/favicons?domain=suno.com&sz=128">
-            <div class="app-info">
-              <h3>Suno</h3>
-              <span>Music Generation</span>
-            </div>
-          </div>
-          <div class="favorite" onclick="toggleFavorite(this)">★</div>
-        </div>
+.modal-content input,
+.modal-content textarea{
+  width:100%;
+  margin-top:12px;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#1e293b;
+  color:white;
+}
 
-        <div class="desc">
-          Generador de canciones completas mediante prompts y composición automática.
-        </div>
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
 
-        <div class="tags">
-          <span class="tag">music</span>
-          <span class="tag">audio</span>
-          <span class="tag">creative</span>
-        </div>
-
-        <div class="card-actions">
-          <a class="btn btn-primary" href="https://suno.com" target="_blank">Abrir</a>
-          <a class="btn btn-secondary" href="https://suno.com" target="_blank">Sitio</a>
-        </div>
-
-        <div class="notes">
-          <textarea placeholder="Notas personales..."></textarea>
-        </div>
-      </div>
-
-      <div class="card" data-category="writing">
-        <div class="card-top">
-          <div class="app">
-            <img src="https://www.google.com/s2/favicons?domain=gptzero.me&sz=128">
-            <div class="app-info">
-              <h3>GPTZero</h3>
-              <span>AI Detection</span>
-            </div>
-          </div>
-          <div class="favorite" onclick="toggleFavorite(this)">★</div>
-        </div>
-
-        <div class="desc">
-          Herramienta para detección de contenido generado mediante inteligencia artificial.
-        </div>
-
-        <div class="tags">
-          <span class="tag">detection</span>
-          <span class="tag">analysis</span>
-        </div>
-
-        <div class="card-actions">
-          <a class="btn btn-primary" href="https://gptzero.me/" target="_blank">Abrir</a>
-          <a class="btn btn-secondary" href="https://gptzero.me/" target="_blank">Sitio</a>
-        </div>
-
-        <div class="notes">
-          <textarea placeholder="Notas personales..."></textarea>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <div class="footer">
-    AI Hub OS · Dashboard personal avanzado para herramientas IA
-  </div>
-
-</main>
+.modal-actions button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+</style>
 
 <script>
-const searchInput = document.getElementById('searchInput');
-const cards = document.querySelectorAll('.card');
-const favCount = document.getElementById('favCount');
+const tools = [
+{name:'ChatGPT',url:'https://chat.openai.com/chat',tag:'Chat',desc:'Asistente IA generalista multimodal.'},
+{name:'Claude',url:'https://claude.ai/new',tag:'Texto',desc:'Excelente para documentos y análisis largos.'},
+{name:'DeepSeek',url:'https://www.deepseek.com/',tag:'Código',desc:'Modelo fuerte en razonamiento y programación.'},
+{name:'Qwen',url:'https://chat.qwenlm.ai/',tag:'Chat',desc:'LLM multilingüe de Alibaba.'},
+{name:'Gemini',url:'https://bard.google.com/',tag:'Google',desc:'IA integrada con el ecosistema Google.'},
+{name:'Perplexity',url:'https://www.perplexity.ai/',tag:'Buscar',desc:'Buscador IA con referencias.'},
+{name:'Blackbox',url:'https://www.blackbox.ai/',tag:'Código',desc:'Asistente IA para developers.'},
+{name:'v0',url:'https://v0.dev/',tag:'Frontend',desc:'Generador IA de interfaces React.'},
+{name:'Lovable',url:'https://lovable.dev/',tag:'Apps',desc:'Creación de apps mediante prompts.'},
+{name:'Bolt',url:'https://bolt.new/',tag:'Apps',desc:'Desarrollo fullstack IA.'},
+{name:'Udio',url:'https://www.udio.com/',tag:'Música',desc:'Generación musical IA.'},
+{name:'Suno',url:'https://suno.com/',tag:'Música',desc:'Canciones completas con IA.'},
+{name:'Riffusion',url:'https://www.riffusion.com/?filter=staff-picks',tag:'Música',desc:'Música generativa experimental.'},
+{name:'DopeLoop',url:'https://dopeloop.ai/',tag:'Audio',desc:'Loops y composición IA.'},
+{name:'RoEx Audio',url:'https://www.roexaudio.com/',tag:'Audio',desc:'Mezcla y mastering IA.'},
+{name:'Kling AI',url:'https://klingai.com/',tag:'Vídeo',desc:'Vídeo IA cinematográfico.'},
+{name:'Krea',url:'https://www.krea.ai/home',tag:'Imagen',desc:'Generación visual y upscale.'},
+{name:'DALL·E',url:'https://openai.com/dall-e-2/',tag:'Imagen',desc:'Generador de imágenes OpenAI.'},
+{name:'Ideogram',url:'https://ideogram.ai/t/explore',tag:'Imagen',desc:'Especializada en texto visual.'},
+{name:'InVideo',url:'https://invideo.io/ai/',tag:'Vídeo',desc:'Creación automática de vídeos.'},
+{name:'Tutorial IA',url:'https://eltecnologuia.com/crea-imagenes-de-cualquier-persona-con-ia-en-5-minutos-y-casi-gratis/',tag:'Tutorial',desc:'Tutorial de generación IA.'},
+{name:'Pollo AI',url:'https://pollo.ai/',tag:'Imagen',desc:'Suite multimodal IA.'},
+{name:'BananaPrompts',url:'https://bananaprompts.xyz/',tag:'Prompts',desc:'Biblioteca de prompts IA.'},
+{name:'HIX Rewriter',url:'https://hix.ai/app/ai-writer/content-rewriter',tag:'Texto',desc:'Reescritura de textos IA.'},
+{name:'GPTZero',url:'https://gptzero.me/',tag:'Detector',desc:'Detector de texto IA.'},
+{name:'Parafrasear AI',url:'https://www.parafrasear.ai/humanizar-texto',tag:'Texto',desc:'Humanizador de textos IA.'},
+{name:'ParaphraseTool',url:'https://www.paraphrasetool.ai/es/humanizar-el-texto-ai',tag:'Texto',desc:'Parafraseo y humanización.'},
+{name:'Tripo3D',url:'http://www.tripo3d.ai/',tag:'3D',desc:'Generación de modelos 3D.'},
+{name:'Higgsfield',url:'https://higgsfield.ai/',tag:'Vídeo',desc:'Vídeo y personajes IA.'},
+{name:'WolframAlpha',url:'https://www.wolframalpha.com/',tag:'Ciencia',desc:'Motor computacional científico.'},
+{name:'Adept',url:'https://www.adept.ai/',tag:'Agentes',desc:'Automatización IA.'},
+{name:'LetsView AI',url:'https://letsview.com/ai-tools',tag:'Directorio',desc:'Catálogo de herramientas IA.'},
+{name:'Sourcegraph',url:'https://sourcegraph.com/',tag:'Código',desc:'Búsqueda y comprensión de código.'},
+{name:'BypassGPT',url:'https://bypassgpt.ai/',tag:'Detector',desc:'Bypass de detección IA.'},
+{name:'HIX Bypass',url:'https://hix.ai/app/bypass-ai-detection',tag:'Detector',desc:'Evasión de detectores IA.'},
+{name:'Apify',url:'https://apify.com/',tag:'Automatizar',desc:'Scraping y automatización web.'},
+{name:'Abogado Virtual',url:'https://app.aiprm.com/gpts/g-j2sGXXAum/abogado-virtual-leyes-espana',tag:'Legal',desc:'GPT legal español.'},
+{name:'Natural Readers',url:'https://www.naturalreaders.com/online/',tag:'Voz',desc:'Texto a voz natural.'},
+{name:'Qwen Chat',url:'https://chat.qwen.ai/',tag:'Chat',desc:'Chat IA de Qwen.'},
+{name:'v0 Chat',url:'https://v0.dev/chat',tag:'Frontend',desc:'Chat frontend IA.'},
+{name:'Emergent',url:'https://app.emergent.sh/',tag:'Agentes',desc:'Plataforma de agentes IA.'},
+{name:'OpenAI Usage',url:'https://platform.openai.com/usage',tag:'API',desc:'Control de uso API OpenAI.'},
+{name:'21st.dev',url:'https://21st.dev/home',tag:'Frontend',desc:'Componentes UI modernos.'}
+];
 
-searchInput.addEventListener('input', function(){
-  const value = this.value.toLowerCase();
+let currentTag = 'Todos';
+let editIndex = null;
 
-  cards.forEach(card => {
-    const text = card.innerText.toLowerCase();
-    card.style.display = text.includes(value) ? 'block' : 'none';
+function renderCards(){
+  const grid = document.getElementById('cardsGrid');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+
+  grid.innerHTML='';
+
+  tools
+  .filter(tool => currentTag === 'Todos' || tool.tag === currentTag)
+  .filter(tool => tool.name.toLowerCase().includes(search) || tool.tag.toLowerCase().includes(search))
+  .forEach((tool,index)=>{
+    grid.innerHTML += `
+      <div class="card">
+        <div class="card-top">
+          <img src="https://www.google.com/s2/favicons?domain=${new URL(tool.url).hostname}&sz=64">
+          <div>
+            <h3>${tool.name}</h3>
+          </div>
+        </div>
+
+        <p>${tool.desc}</p>
+
+        <div class="tags">
+          <span class="tag">${tool.tag}</span>
+        </div>
+
+        <div class="card-actions">
+          <a class="open-btn" href="${tool.url}" target="_blank">Abrir</a>
+          <button class="edit-btn" onclick="editTool(${index})">Editar</button>
+          <button class="delete-btn" onclick="deleteTool(${index})">X</button>
+        </div>
+      </div>
+    `;
   });
-});
+}
 
-function filterCategory(category){
-  document.querySelectorAll('.menu button').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
+function renderTags(){
+  const tags = ['Todos', ...new Set(tools.map(t=>t.tag))];
+  const container = document.getElementById('tagFilters');
 
-  cards.forEach(card => {
-    if(category === 'all'){
-      card.style.display = 'block';
-    } else {
-      card.style.display = card.dataset.category === category ? 'block' : 'none';
-    }
+  container.innerHTML='';
+
+  tags.forEach(tag=>{
+    container.innerHTML += `
+      <div class="tag-filter ${currentTag===tag?'active':''}" onclick="selectTag('${tag}')">${tag}</div>
+    `;
   });
 }
 
-function toggleFavorite(el){
-  el.classList.toggle('active');
-  updateFavCount();
+function selectTag(tag){
+  currentTag = tag;
+  renderTags();
+  renderCards();
 }
 
-function updateFavCount(){
-  const count = document.querySelectorAll('.favorite.active').length;
-  favCount.innerText = count;
+document.getElementById('searchInput').addEventListener('input', renderCards);
+
+function deleteTool(index){
+  tools.splice(index,1);
+  renderCards();
+  renderTags();
 }
 
-function showFavorites(){
-  cards.forEach(card => {
-    const fav = card.querySelector('.favorite');
-    card.style.display = fav.classList.contains('active') ? 'block' : 'none';
-  });
+function editTool(index){
+  editIndex=index;
+  const tool=tools[index];
+
+  document.getElementById('toolName').value=tool.name;
+  document.getElementById('toolUrl').value=tool.url;
+  document.getElementById('toolTag').value=tool.tag;
+  document.getElementById('toolDesc').value=tool.desc;
+
+  document.getElementById('toolModal').style.display='flex';
 }
+
+function openAddModal(){
+  editIndex=null;
+  document.getElementById('toolName').value='';
+  document.getElementById('toolUrl').value='';
+  document.getElementById('toolTag').value='';
+  document.getElementById('toolDesc').value='';
+
+  document.getElementById('toolModal').style.display='flex';
+}
+
+function closeModal(){
+  document.getElementById('toolModal').style.display='none';
+}
+
+function saveTool(){
+  const tool={
+    name:document.getElementById('toolName').value,
+    url:document.getElementById('toolUrl').value,
+    tag:document.getElementById('toolTag').value,
+    desc:document.getElementById('toolDesc').value
+  };
+
+  if(editIndex===null){
+    tools.push(tool);
+  } else {
+    tools[editIndex]=tool;
+  }
+
+  closeModal();
+  renderCards();
+  renderTags();
+}
+
+renderTags();
+renderCards();
 </script>
 
 </body>
