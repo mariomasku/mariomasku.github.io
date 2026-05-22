@@ -1,351 +1,432 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Hub OS</title>
-<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/5278/5278402.png">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5278/5278402.png">
-<meta name="theme-color" content="#24212f">
-<!-- ACTUALIZADO: tarjetas compactas, todas las URLs incluidas, filtros por etiquetas, edición y eliminación -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#0b1020;
-  --panel:#12192b;
-  --panel-2:#1a2338;
-  --border:#2a3550;
-  --text:#f3f4f6;
-  --muted:#9ca3af;
-  --accent:#60a5fa;
-  --accent-2:#8b5cf6;
-  --success:#34d399;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Hub OS</title>
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/5278/5278402.png">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5278/5278402.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* VARIABLES DE TEMA - MODO OSCURO POR DEFECTO */
+    :root {
+      --bg: #0f111a;
+      --sidebar: #151824;
+      --card: #1c2030;
+      --card-hover: #23293d;
+      --border: rgba(255, 255, 255, 0.06);
+      --input-bg: #1c2030;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #4f46e5;
+      --accent-hover: #6366f1;
+      --shadow: rgba(0, 0, 0, 0.3);
+      --tag-bg: rgba(79, 70, 229, 0.15);
+      --tag-text: #818cf8;
+    }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+    /* VARIABLES MODO CLARO */
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --sidebar: #ffffff;
+      --card: #ffffff;
+      --card-hover: #f1f5f9;
+      --border: rgba(0, 0, 0, 0.06);
+      --input-bg: #f1f5f9;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #4f46e5;
+      --accent-hover: #3730a3;
+      --shadow: rgba(0, 0, 0, 0.05);
+      --tag-bg: rgba(79, 70, 229, 0.08);
+      --tag-text: #4f46e5;
+    }
 
-body{
-  font-family:'Inter',sans-serif;
-  background:radial-gradient(circle at top,#1b2440 0%,#0b1020 40%);
-  color:var(--text);
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    }
 
-.sidebar{
-  width:280px;
-  background:rgba(10,15,30,0.88);
-  backdrop-filter:blur(20px);
-  border-right:1px solid var(--border);
-  padding:28px;
-  position:sticky;
-  top:0;
-  height:100vh;
-}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
 
-.logo{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  margin-bottom:40px;
-}
+    .layout {
+      display: flex;
+    }
 
-.logo-icon{
-  width:52px;
-  height:52px;
-  border-radius:16px;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
-  font-size:20px;
-}
+    /* BARRA LATERAL LIMPIA */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      z-index: 10;
+    }
 
-.logo h1{
-  font-size:22px;
-}
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
 
-.logo p{
-  color:var(--muted);
-  font-size:13px;
-}
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content:center;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+    }
 
-.menu{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
 
-.menu button{
-  background:transparent;
-  border:1px solid transparent;
-  color:var(--muted);
-  padding:14px;
-  border-radius:14px;
-  cursor:pointer;
-  text-align:left;
-  transition:0.25s;
-  font-size:15px;
-}
+    .brand p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
 
-.menu button:hover,
-.menu button.active{
-  background:var(--panel-2);
-  color:white;
-  border-color:var(--border);
-}
+    .search {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
 
-.main{
-  flex:1;
-  padding:40px;
-}
+    .search:focus {
+      border-color: var(--accent);
+    }
 
-.topbar{
-  display:flex;
-  gap:20px;
-  margin-bottom:30px;
-  flex-wrap:wrap;
-}
+    .sidebar-section h3 {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
 
-.search{
-  flex:1;
-  min-width:240px;
-  background:rgba(20,28,48,0.85);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:18px 20px;
-  color:white;
-  font-size:15px;
-}
+    /* DESPLEGABLE MULTISELECCIÓN DE ETIQUETAS */
+    .multiselect-container {
+      position: relative;
+    }
 
-.stats{
-  display:flex;
-  gap:14px;
-}
+    .select-box {
+      width: 100%;
+      padding: 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
 
-.stat-card{
-  background:rgba(18,25,43,0.8);
-  border:1px solid var(--border);
-  padding:16px 20px;
-  border-radius:18px;
-  min-width:140px;
-}
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 105%;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 20;
+      box-shadow: 0 10px 25px var(--shadow);
+      padding: 6px;
+    }
 
-.stat-card h3{
-  font-size:24px;
-  margin-bottom:4px;
-}
+    .dropdown-content.show {
+      display: block;
+    }
 
-.stat-card p{
-  color:var(--muted);
-  font-size:13px;
-}
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
 
-.section{
-  margin-bottom:55px;
-}
+    .dropdown-item:hover {
+      background: var(--card-hover);
+    }
 
-.section-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:22px;
-}
+    .dropdown-item input {
+      cursor: pointer;
+    }
 
-.section h2{
-  font-size:28px;
-}
+    /* BOTONES ACCIÓN LATERAL */
+    .btn-action {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-  gap:22px;
-}
+    .btn-action:hover {
+      background: var(--card-hover);
+    }
 
-.card{
-  background:rgba(18,25,43,0.82);
-  backdrop-filter:blur(16px);
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:24px;
-  padding:24px;
-  position:relative;
-  overflow:hidden;
-  transition:0.28s;
-}
+    .btn-primary-sidebar {
+      background: var(--accent);
+      color: white;
+      border: none;
+    }
 
-.card:hover{
-  transform:translateY(-6px);
-  border-color:#4f75ff;
-  box-shadow:0 20px 60px rgba(0,0,0,0.35);
-}
+    .btn-primary-sidebar:hover {
+      background: var(--accent-hover);
+    }
 
-.card::before{
-  content:'';
-  position:absolute;
-  top:-40px;
-  right:-40px;
-  width:140px;
-  height:140px;
-  background:radial-gradient(circle,#60a5fa33 0%,transparent 70%);
-}
+    .sidebar-footer {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-.card-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:18px;
-}
+    /* CONTENIDO PRINCIPAL */
+    .content {
+      flex: 1;
+      padding: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
 
-.app{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
+    .category-block {
+      margin-bottom: 40px;
+    }
 
-.app img{
-  width:48px;
-  height:48px;
-  border-radius:14px;
-  background:white;
-}
+    .category-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
 
-.app-info h3{
-  font-size:19px;
-}
+    /* REJILLA DE TARJETAS ESTILO LETSVIEW */
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
 
-.app-info span{
-  color:var(--muted);
-  font-size:13px;
-}
+    .app-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
 
-.favorite{
-  cursor:pointer;
-  font-size:22px;
-  opacity:0.6;
-  transition:0.2s;
-}
+    .app-card:hover {
+      transform: translateY(-2px);
+      background: var(--card-hover);
+      border-color: var(--accent);
+    }
 
-.favorite.active{
-  opacity:1;
-  color:#fbbf24;
-}
+    .app-header-inline {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-.desc{
-  color:#cfd6e4;
-  line-height:1.65;
-  font-size:14px;
-  min-height:88px;
-  margin-bottom:18px;
-}
+    .app-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
 
-.tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:20px;
-}
+    .app-icon img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
 
-.tag{
-  padding:6px 11px;
-  border-radius:999px;
-  background:#202b46;
-  border:1px solid #31405f;
-  color:#9cc2ff;
-  font-size:12px;
-}
+    .app-name {
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 1.2;
+    }
 
-.card-actions{
-  display:flex;
-  gap:12px;
-}
+    .app-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 54px;
+    }
 
-.btn{
-  flex:1;
-  text-align:center;
-  text-decoration:none;
-  padding:13px;
-  border-radius:14px;
-  font-weight:600;
-  transition:0.2s;
-}
+    .tooltip-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+    }
 
-.btn-primary{
-  background:linear-gradient(135deg,#2563eb,#7c3aed);
-  color:white;
-}
+    .tooltip-tag {
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+    }
 
-.btn-secondary{
-  background:#1f2937;
-  color:#d1d5db;
-  border:1px solid #374151;
-}
+    /* PANEL DE ADMINISTRACIÓN */
+    .admin-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 400px;
+      height: 100vh;
+      background: var(--sidebar);
+      border-left: 1px solid var(--border);
+      padding: 24px;
+      overflow-auto: auto;
+      z-index: 100;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+    }
 
-.btn:hover{
-  transform:translateY(-2px);
-}
+    .hidden { display: none; }
 
-.notes{
-  margin-top:18px;
-}
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
-.notes textarea{
-  width:100%;
-  background:#0f172a;
-  border:1px solid #263247;
-  border-radius:14px;
-  padding:12px;
-  color:white;
-  resize:vertical;
-  min-height:72px;
-}
+    .admin-form input, .admin-form textarea {
+      width: 100%;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
 
-.footer{
-  margin-top:80px;
-  text-align:center;
-  color:var(--muted);
-}
+    .admin-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
 
-@media(max-width:1100px){
-  body{
-    flex-direction:column;
-  }
+    .admin-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
 
-  .sidebar{
-    width:100%;
-    height:auto;
-    position:relative;
-  }
-}
-</style>
+    .admin-actions button {
+      flex: 1;
+      border: none;
+      border-radius: 6px;
+      padding: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      color: white;
+    }
+
+    .edit-action { background: #4b5563; }
+    .delete-action { background: #dc2626; }
+
+    @media(max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: relative; }
+      .content { padding: 20px; }
+    }
+  </style>
 </head>
 <body>
+
 <div class="layout">
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-logo">AI</div>
       <div>
         <h1>AI Hub OS</h1>
-        <p>Sistema operativo personal IA</p>
+        <p>Tu Directorio Personal</p>
       </div>
     </div>
 
     <input id="search" type="text" placeholder="Buscar herramienta..." class="search">
 
     <div class="sidebar-section">
-      <h3>Categorías</h3>
-      <div id="filters" class="filters"></div>
+      <h3>Filtrar por Etiquetas</h3>
+      <div class="multiselect-container">
+        <div class="select-box" onclick="toggleDropdown()">
+          <span id="selectedCount">Todas las etiquetas</span>
+          <span>▼</span>
+        </div>
+        <div id="dropdownContent" class="dropdown-content"></div>
+      </div>
     </div>
 
-    <div class="sidebar-section">
-      <button class="admin-btn" onclick="toggleAdminPanel()">Panel administración</button>
+    <div class="sidebar-footer">
+      <button class="btn-action" onclick="toggleTheme()">🌓 Cambiar Aspecto</button>
+      <button class="btn-action btn-primary-sidebar" onclick="toggleAdminPanel()">🛠️ Administración</button>
     </div>
   </aside>
 
@@ -356,570 +437,251 @@ body{
 
 <div id="adminPanel" class="admin-panel hidden">
   <div class="admin-header">
-    <h2>Administración de herramientas</h2>
-    <button onclick="toggleAdminPanel()">Cerrar</button>
+    <h2>Gestionar Links</h2>
+    <button class="btn-action" style="width:auto; padding:6px 12px;" onclick="toggleAdminPanel()">✕</button>
   </div>
-
   <div class="admin-form">
-    <input id="toolName" placeholder="Nombre">
-    <input id="toolUrl" placeholder="URL">
-    <input id="toolCategory" placeholder="Categoría">
-    <input id="toolTags" placeholder="Etiquetas separadas por coma">
-    <textarea id="toolDescription" placeholder="Descripción"></textarea>
-
-    <button onclick="saveTool()">Guardar herramienta</button>
+    <input id="toolName" placeholder="Nombre de la herramienta">
+    <input id="toolUrl" placeholder="URL completa (https://...)">
+    <input id="toolCategory" placeholder="Categoría (ej: Desarrollo)">
+    <input id="toolTags" placeholder="Etiquetas (separadas por comas)">
+    <textarea id="toolDescription" placeholder="Descripción en español..." rows="3"></textarea>
+    <button class="btn-action btn-primary-sidebar" onclick="saveTool()">Guardar Entrada</button>
   </div>
-
   <div id="adminList"></div>
 </div>
 
-<style>
-:root{
-  --bg:#24212f;
-  --sidebar:#1f1d29;
-  --card:#353344;
-  --card-hover:#46435a;
-  --border:#4e4b63;
-  --text:#f2f2f3;
-  --muted:#b6b5c3;
-  --accent:#6c7dff;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Inter,sans-serif;
-}
-
-.layout{
-  display:flex;
-  min-height:100vh;
-}
-
-.sidebar{
-  width:290px;
-  background:var(--sidebar);
-  border-right:1px solid rgba(255,255,255,0.06);
-  padding:24px;
-  position:sticky;
-  top:0;
-  height:100vh;
-  overflow:auto;
-}
-
-.brand{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  margin-bottom:28px;
-}
-
-.brand-logo{
-  width:52px;
-  height:52px;
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,#6c7dff,#8b5cf6);
-  font-weight:800;
-}
-
-.brand h1{
-  margin:0;
-  font-size:22px;
-}
-
-.brand p{
-  margin:4px 0 0;
-  color:var(--muted);
-  font-size:13px;
-}
-
-.search{
-  width:100%;
-  border:none;
-  background:#2d2a3c;
-  color:white;
-  padding:14px;
-  border-radius:14px;
-  margin-bottom:28px;
-}
-
-.sidebar-section h3{
-  color:var(--muted);
-  font-size:14px;
-  margin-bottom:12px;
-}
-
-.filters{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-
-.filter-btn{
-  background:#2d2a3c;
-  border:none;
-  color:#d4d4dc;
-  border-radius:999px;
-  padding:9px 12px;
-  cursor:pointer;
-  font-size:12px;
-}
-
-.filter-btn.active{
-  background:var(--accent);
-  color:white;
-}
-
-.admin-btn{
-  width:100%;
-  border:none;
-  background:var(--accent);
-  color:white;
-  padding:14px;
-  border-radius:14px;
-  cursor:pointer;
-  margin-top:28px;
-  font-weight:600;
-}
-
-.content{
-  flex:1;
-  padding:28px;
-}
-
-.category-block{
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.08);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border-radius:30px;
-  padding:26px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.18);
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.08);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border-radius:30px;
-  padding:26px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.18);
-
-  margin-bottom:38px;
-}
-
-.category-title{
-  font-size:22px;
-  margin-bottom:18px;
-  color:white;
-}
-
-.apps-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(92px,1fr));
-  gap:20px;
-}
-
-.app-card{
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-  text-decoration:none;
-  color:white;
-}
-
-.app-icon{
-  width:72px;
-  height:72px;
-  border-radius:22px;
-  background:var(--card);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition:0.18s;
-  border:1px solid transparent;
-}
-
-.app-icon:hover{
-  transform:translateY(-3px);
-  background:var(--card-hover);
-  border-color:#6c7dff;
-}
-
-.app-icon img{
-  width:42px;
-  height:42px;
-  border-radius:12px;
-}
-
-.app-name{
-  text-align:center;
-  font-size:14px;
-  line-height:1.25;
-  color:#ececf1;
-}
-
-.tooltip{
-  position:absolute;
-  bottom:105px;
-  left:50%;
-  transform:translateX(-50%);
-  width:240px;
-  background:#17151f;
-  border:1px solid rgba(255,255,255,0.08);
-  padding:14px;
-  border-radius:14px;
-  opacity:0;
-  pointer-events:none;
-  transition:0.2s;
-  z-index:10;
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}
-
-.app-card:hover .tooltip{
-  opacity:1;
-}
-
-.tooltip h4{
-  margin:0 0 8px;
-  font-size:15px;
-}
-
-.tooltip p{
-  margin:0;
-  font-size:13px;
-  color:#c4c4d0;
-  line-height:1.5;
-}
-
-.tooltip-tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:10px;
-}
-
-.tooltip-tag{
-  background:#2a2736;
-  padding:4px 8px;
-  border-radius:999px;
-  font-size:11px;
-  color:#9ab0ff;
-}
-
-.admin-panel{
-  position:fixed;
-  top:0;
-  right:0;
-  width:420px;
-  height:100vh;
-  background:#191723;
-  border-left:1px solid rgba(255,255,255,0.08);
-  padding:24px;
-  overflow:auto;
-  z-index:100;
-}
-
-.hidden{
-  display:none;
-}
-
-.admin-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:24px;
-}
-
-.admin-form input,
-.admin-form textarea{
-  width:100%;
-  margin-bottom:12px;
-  border:none;
-  background:#2b2838;
-  color:white;
-  padding:12px;
-  border-radius:12px;
-}
-
-.admin-form button{
-  width:100%;
-  padding:14px;
-  border:none;
-  background:var(--accent);
-  color:white;
-  border-radius:12px;
-  cursor:pointer;
-}
-
-.admin-item{
-  background:#252231;
-  padding:14px;
-  border-radius:14px;
-  margin-top:14px;
-}
-
-.admin-item-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.admin-actions{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-}
-
-.admin-actions button{
-  flex:1;
-  border:none;
-  border-radius:10px;
-  padding:10px;
-  cursor:pointer;
-}
-
-.edit-action{
-  background:#374151;
-  color:white;
-}
-
-.delete-action{
-  background:#7f1d1d;
-  color:white;
-}
-</style>
-
 <script>
+// BASE DE DATOS LOCAL CON TEXTOS TRADUCIDOS Y CORREGIDOS
 let tools = JSON.parse(localStorage.getItem('aihub_tools')) || [
-{name:'ChatGPT',url:'https://chat.openai.com/chat',category:'Chat IA',tags:['LLM','Multimodal','Productividad'],description:'Asistente multimodal generalista para razonamiento, programación, automatización, análisis y creación de contenido.'},
-{name:'Claude',url:'https://claude.ai/new',category:'Desarrollo',tags:['LLM','Coding','Artifacts','Reasoning'],description:'Modelo frontier especialmente fuerte en programación, razonamiento avanzado y análisis de documentos extensos.'},
-{name:'Claude Code',url:'https://www.anthropic.com/claude-code',category:'Desarrollo',tags:['CLI','Coding','Agentic'],description:'Entorno agentic de Claude para programación desde terminal y workflows avanzados de ingeniería.'},
-{name:'Perplexity',url:'https://www.perplexity.ai/',category:'Investigación',tags:['Buscar','Research','Web'],description:'Motor de respuestas IA orientado a investigación con referencias y navegación web integrada.'},
-{name:'DeepSeek',url:'https://www.deepseek.com/',category:'Desarrollo',tags:['Código','LLM','Reasoning'],description:'Modelo IA muy fuerte en programación, razonamiento lógico y tareas técnicas.'},
-{name:'Blackbox',url:'https://www.blackbox.ai/',category:'Desarrollo',tags:['Código','IDE','Developer'],description:'Asistente de programación con búsqueda de código y generación contextual.'},
-{name:'Qwen AI',url:'https://chat.qwenlm.ai/',category:'Chat IA',tags:['LLM','Multilingüe'],description:'Modelo de Alibaba optimizado para tareas multilingües y técnicas.'},
-{name:'Gemini',url:'https://bard.google.com/',category:'Chat IA',tags:['Google','Workspace'],description:'IA de Google integrada con búsqueda y ecosistema Workspace.'},
-{name:'v0',url:'https://v0.dev/',category:'Desarrollo',tags:['Frontend','UI'],description:'Generador de interfaces React/Tailwind mediante prompts.'},
-{name:'Lovable',url:'https://lovable.dev/',category:'Desarrollo',tags:['Apps','NoCode'],description:'Creación rápida de aplicaciones mediante IA conversacional.'},
-{name:'Bolt',url:'https://bolt.new/',category:'Desarrollo',tags:['Fullstack','Apps'],description:'Entorno IA para construir aplicaciones completas desde el navegador.'},
-{name:'21st.dev',url:'https://21st.dev/home',category:'Desarrollo',tags:['UI','Componentes'],description:'Biblioteca moderna de componentes UI para desarrollo frontend.'},
-{name:'Sourcegraph',url:'https://sourcegraph.com/',category:'Desarrollo',tags:['Código','Codebase'],description:'Motor de inteligencia y búsqueda avanzada sobre bases de código.'},
-{name:'Apify',url:'https://apify.com/',category:'Automatización',tags:['Scraping','Bots'],description:'Plataforma de scraping, automatización y agentes web.'},
-{name:'Emergent',url:'https://app.emergent.sh/',category:'Agentes IA',tags:['Agentes','Automatización'],description:'Plataforma para creación y orquestación de agentes IA.'},
-{name:'Adept',url:'https://www.adept.ai/',category:'Agentes IA',tags:['Computer Use','Agentes'],description:'IA enfocada en automatización y uso autónomo del ordenador.'},
-{name:'Krea',url:'https://www.krea.ai/home',category:'Imagen IA',tags:['Imagen','Diseño'],description:'Generación visual en tiempo real, upscale y creatividad asistida.'},
-{name:'Ideogram',url:'https://ideogram.ai/t/explore',category:'Imagen IA',tags:['Tipografía','Diseño'],description:'Generador visual especializado en texto dentro de imágenes.'},
-{name:'DALL·E',url:'https://openai.com/dall-e-2/',category:'Imagen IA',tags:['Imagen','OpenAI'],description:'Modelo de OpenAI para generación de imágenes mediante prompts.'},
-{name:'Kling',url:'https://klingai.com/',category:'Vídeo IA',tags:['Vídeo','Cine'],description:'Generación avanzada de vídeo IA con calidad cinematográfica.'},
-{name:'InVideo',url:'https://invideo.io/ai/',category:'Vídeo IA',tags:['Edición','Vídeo'],description:'Creación automática de vídeos desde texto o prompts.'},
-{name:'Higgsfield',url:'https://higgsfield.ai/',category:'Vídeo IA',tags:['Vídeo','Personajes'],description:'Generación de escenas y personajes IA para contenido visual.'},
-{name:'Pollo AI',url:'https://pollo.ai/',category:'Multimodal',tags:['Imagen','Vídeo'],description:'Suite multimodal con herramientas IA creativas.'},
-{name:'Suno',url:'https://suno.com/',category:'Audio IA',tags:['Música','Canciones'],description:'Generador completo de canciones con voz e instrumentación.'},
-{name:'Udio',url:'https://www.udio.com/',category:'Audio IA',tags:['Música','Producción'],description:'Plataforma IA avanzada para composición musical.'},
-{name:'Riffusion',url:'https://www.riffusion.com/?filter=staff-picks',category:'Audio IA',tags:['Música','Experimental'],description:'Generación musical experimental mediante difusión IA.'},
-{name:'RoEx Audio',url:'https://www.roexaudio.com/',category:'Audio IA',tags:['Mastering','Audio'],description:'Herramientas IA para mezcla y mastering.'},
-{name:'DopeLoop',url:'https://dopeloop.ai/',category:'Audio IA',tags:['Loops','Producción'],description:'Herramienta IA orientada a creación de loops musicales y composición rápida.'},
-{name:'Natural Readers',url:'https://www.naturalreaders.com/online/',category:'Audio IA',tags:['Voz','TTS'],description:'Conversión de texto a voz natural.'},
-{name:'GPTZero',url:'https://gptzero.me/',category:'Detección IA',tags:['Detector','Texto'],description:'Detector de contenido generado mediante IA.'},
-{name:'BypassGPT',url:'https://bypassgpt.ai/',category:'Humanización',tags:['Bypass','Texto'],description:'Humanización y reformulación para evasión de detectores IA.'},
-{name:'HIX Rewriter',url:'https://hix.ai/app/ai-writer/content-rewriter',category:'Humanización',tags:['Reescritura','Texto'],description:'Herramienta IA para reformulación y reescritura avanzada de contenido.'},
-{name:'HIX Bypass',url:'https://hix.ai/app/bypass-ai-detection',category:'Humanización',tags:['Bypass','Detector'],description:'Herramienta para reescribir contenido y evitar detección IA.'},
-{name:'Parafrasear AI',url:'https://www.parafrasear.ai/humanizar-texto',category:'Humanización',tags:['Parafraseo','Texto'],description:'Reescritura y humanización de textos generados por IA.'},
-{name:'ParaphraseTool',url:'https://www.paraphrasetool.ai/es/humanizar-el-texto-ai',category:'Humanización',tags:['Texto','Paráfrasis'],description:'Paráfrasis y reformulación de contenido.'},
-{name:'BananaPrompts',url:'https://bananaprompts.xyz/',category:'Prompts',tags:['Prompts','Biblioteca'],description:'Colección y explorador de prompts IA.'},
-{name:'WolframAlpha',url:'https://www.wolframalpha.com/',category:'Ciencia',tags:['Matemáticas','Datos'],description:'Motor computacional de conocimiento científico y matemático.'},
-{name:'Tripo3D',url:'http://www.tripo3d.ai/',category:'3D IA',tags:['3D','Modelado'],description:'Generación automática de modelos 3D mediante IA.'},
-{name:'LetsView AI',url:'https://letsview.com/ai-tools',category:'Directorios',tags:['Catálogo','Herramientas'],description:'Directorio de herramientas IA.'},
-{name:'Tutorial IA',url:'https://eltecnologuia.com/crea-imagenes-de-cualquier-persona-con-ia-en-5-minutos-y-casi-gratis/',category:'Tutoriales',tags:['Guía','Imagen'],description:'Tutorial sobre generación de imágenes mediante inteligencia artificial.'},
-{name:'Abogado Virtual',url:'https://app.aiprm.com/gpts/g-j2sGXXAum/abogado-virtual-leyes-espana',category:'Legal',tags:['Derecho','GPT'],description:'GPT especializado en legislación española.'},
-{name:'OpenAI Usage',url:'https://platform.openai.com/usage',category:'APIs',tags:['API','Costes'],description:'Panel de consumo y métricas API OpenAI.'},
-{name:'Qwen Chat',url:'https://chat.qwen.ai/',category:'Chat IA',tags:['LLM','Chat'],description:'Interfaz conversacional alternativa del ecosistema Qwen.'},
-{name:'v0 Chat',url:'https://v0.dev/chat',category:'Desarrollo',tags:['Frontend','Chat UI'],description:'Entorno conversacional de v0 para generación iterativa de interfaces.'}
+  {name:'ChatGPT',url:'https://chat.openai.com/',category:'Chat IA',tags:['LLM','Productividad','Multimodal'],description:'Asistente multimodal avanzado para redacción, programación, análisis y resolución de problemas cotidianos.'},
+  {name:'Claude',url:'https://claude.ai/',category:'Desarrollo',tags:['LLM','Programación','Análisis'],description:'Modelo conversacional excelente en procesamiento de textos largos, lógica estructurada e ingeniería de software.'},
+  {name:'Claude Code',url:'https://www.anthropic.com/claude-code',category:'Desarrollo',tags:['Terminal','Agentes','CLI'],description:'Agente de terminal avanzado diseñado para integrarse en repositorios locales y automatizar flujos de código.'},
+  {name:'Perplexity',url:'https://www.perplexity.ai/',category:'Investigación',tags:['Buscador','Web','Referencias'],description:'Buscador conversacional que rastrea la web en tiempo real entregando fuentes fiables y resúmenes estructurados.'},
+  {name:'DeepSeek',url:'https://www.deepseek.com/',category:'Desarrollo',tags:['LLM','Razonamiento','Código'],description:'Modelo enfocado en un razonamiento matemático superior, programación avanzada y eficiencia técnica abierta.'},
+  {name:'Blackbox AI',url:'https://www.blackbox.ai/',category:'Desarrollo',tags:['Código','IDE'],description:'Asistente enfocado en autocompletado de código rápido, explicaciones de bugs y búsqueda contextual.'},
+  {name:'Qwen AI',url:'https://chat.qwenlm.ai/',category:'Chat IA',tags:['LLM','Multilingüe'],description:'Ecosistema potente con capacidades multilingües óptimas y versatilidad en tareas lógicas.'},
+  {name:'Gemini',url:'https://gemini.google.com/',category:'Chat IA',tags:['Google','Workspace'],description:'Modelo nativo multimodal integrado de forma nativa con los servicios de búsqueda y ecosistema de Google.'},
+  {name:'v0',url:'https://v0.dev/',category:'Desarrollo',tags:['Frontend','UI','React'],description:'Generador de componentes de interfaz basados en React y Tailwind CSS mediante lenguaje natural.'},
+  {name:'Lovable',url:'https://lovable.dev/',category:'Desarrollo',tags:['NoCode','Apps'],description:'Plataforma ágil para construir, desplegar e iterar aplicaciones web completas sin código técnico.'},
+  {name:'Bolt.new',url:'https://bolt.new/',category:'Desarrollo',tags:['Fullstack','WebContainers'],description:'Entorno completo de desarrollo en el navegador que permite compilar aplicaciones full-stack de inicio a fin.'},
+  {name:'21st.dev',url:'https://21st.dev/',category:'Desarrollo',tags:['UI','Componentes'],description:'Catálogo moderno de recursos y librerías visuales listas para implementar en desarrollos de vanguardia.'},
+  {name:'Sourcegraph',url:'https://sourcegraph.com/',category:'Desarrollo',tags:['Código','Buscador'],description:'Plataforma avanzada para indexar, explorar y comprender extensas bases de código empresariales.'},
+  {name:'Apify',url:'https://apify.com/',category:'Automatización',tags:['Scraping','Datos'],description:'Nube modular para la extracción de datos, web scraping y automatizaciones mediante bots e integraciones.'},
+  {name:'Emergent',url:'https://app.emergent.sh/',category:'Agentes IA',tags:['Agentes','Automatización'],description:'Orquestador visual para definir flujos de trabajo autónomos controlados por agentes inteligentes.'},
+  {name:'Adept',url:'https://www.adept.ai/',category:'Agentes IA',tags:['Automatización','Software'],description:'Modelos entrenados para interactuar directamente con interfaces digitales y software emulando al humano.'},
+  {name:'Krea',url:'https://www.krea.ai/',category:'Imagen IA',tags:['Diseño','Generación'],description:'Herramienta creativa interactiva para escalado de imágenes, generación en tiempo real y edición artística.'},
+  {name:'Ideogram',url:'https://ideogram.ai/',category:'Imagen IA',tags:['Tipografía','Diseño'],description:'Generador artístico de imágenes con una precisión excepcional en la renderización de textos y marcas.'},
+  {name:'DALL·E',url:'https://openai.com/dall-e-3/',category:'Imagen IA',tags:['OpenAI','Ilustración'],description:'El clásico transformador de texto a imagen de OpenAI conocido por su estricto apego al prompt del usuario.'},
+  {name:'Kling',url:'https://klingai.com/',category:'Vídeo IA',tags:['Cinematografía','Vídeo'],description:'Generador de clips de video hiperrealistas con movimientos coherentes físicos y calidad de cine.'},
+  {name:'InVideo',url:'https://invideo.io/',category:'Vídeo IA',tags:['Edición','Guión'],description:'Automatiza la producción de videos comerciales recopilando multimedia, voz en off y guiones automáticamente.'},
+  {name:'Higgsfield',url:'https://higgsfield.ai/',category:'Vídeo IA',tags:['Animación','Social'],description:'Aplicación enfocada en la creación y personalización dinámica de personajes animados con física real.'},
+  {name:'Suno',url:'https://suno.com/',category:'Audio IA',tags:['Música','Composición'],description:'Generador musical capaz de orquestar canciones completas con voces realistas a partir de letras o estilos.'},
+  {name:'Udio',url:'https://www.udio.com/',category:'Audio IA',tags:['Música','Producción'],description:'Herramienta de alta fidelidad para masterizar, extender y componer temas musicales en diversos géneros.'},
+  {name:'GPTZero',url:'https://gptzero.me/',category:'Detección IA',tags:['Análisis','Filtro'],description:'Analizador forense de textos diseñado para detectar patrones típicos de redacción automatizada.'},
+  {name:'BypassGPT',url:'https://bypassgpt.ai/',category:'Humanización',tags:['Redacción','Filtro'],description:'Reescritor de contenidos enfocado en suavizar las estructuras para eludir falsos positivos de software detector.'},
+  {name:'WolframAlpha',url:'https://www.wolframalpha.com/',category:'Ciencia',tags:['Matemáticas','Datos'],description:'Motor de conocimiento experto y computación simbólica para resolver complejas fórmulas científicas.'},
+  {name:'Tripo3D',url:'https://www.tripo3d.ai/',category:'3D IA',tags:['Modelado','Motores'],description:'Transforma imágenes estáticas o texto descriptivo en mallas tridimensionales listas para videojuegos.'}
 ];
 
-let draggedIndex = null;
-
-let currentFilter = 'Todos';
+let selectedTags = [];
 let editIndex = null;
 
-function getAllTags(){
- const tags = new Set();
- tools.forEach(t => {
-   tags.add(t.category);
-   t.tags.forEach(tag => tags.add(tag));
- });
- return ['Todos', ...Array.from(tags)];
+// GESTIÓN DE CONFIGURACIÓN DE TEMA
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const target = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', target);
 }
 
-function renderFilters(){
- const filters = document.getElementById('filters');
- filters.innerHTML = '';
-
- getAllTags().forEach(tag => {
-   filters.innerHTML += `<button class="filter-btn ${currentFilter===tag?'active':''}" onclick="setFilter('${tag}')">${tag}</button>`;
- });
+// DROPDOWN MULTISELECCIÓN
+function toggleDropdown() {
+  document.getElementById('dropdownContent').classList.toggle('show');
 }
 
-function setFilter(tag){
- currentFilter = tag;
- persist();
- renderFilters();
- renderCategories();
+// Cerrar dropdown al hacer clic fuera
+window.onclick = function(event) {
+  if (!event.target.matches('.select-box') && !event.target.matches('.select-box *') && !event.target.matches('.dropdown-item') && !event.target.matches('.dropdown-item *')) {
+    document.getElementById('dropdownContent').classList.remove('show');
+  }
 }
 
-function renderCategories(){
- const container = document.getElementById('categoriesContainer');
- const search = document.getElementById('search').value.toLowerCase();
- container.innerHTML='';
-
- const categories = [...new Set(tools.map(t=>t.category))];
-
- categories.forEach(category=>{
-   const filtered = tools.filter(tool=>{
-     const matchSearch = tool.name.toLowerCase().includes(search) || tool.description.toLowerCase().includes(search);
-     const matchFilter = currentFilter==='Todos' || tool.category===currentFilter || tool.tags.includes(currentFilter);
-     return tool.category===category && matchSearch && matchFilter;
-   });
-
-   if(filtered.length===0) return;
-
-   const block = document.createElement('div');
-   block.className='category-block';
-
-   block.innerHTML=`
-     <h2 class="category-title">${category}</h2>
-     <div class="apps-grid" data-category="${category}">
-       ${filtered.map(tool=>`
-         <a class="app-card" draggable="true" ondragstart="dragStart(event, ${tools.indexOf(tool)})" ondragover="allowDrop(event)" ondrop="dropCard(event, '${category}')" href="${tool.url}" target="_blank">
-           <div class="tooltip">
-             <h4>${tool.name}</h4>
-             <p>${tool.description}</p>
-             <div class="tooltip-tags">
-               ${tool.tags.map(tag=>`<span class="tooltip-tag">${tag}</span>`).join('')}
-             </div>
-           </div>
-
-           <div class="app-icon">
-             <img src="https://www.google.com/s2/favicons?domain=${new URL(tool.url).hostname}&sz=128">
-           </div>
-
-           <div class="app-name">${tool.name}</div>
-         </a>
-       `).join('')}
-     </div>
-   `;
-
-   container.appendChild(block);
- });
-
- renderAdminList();
- persist();
- persist();
+function getUniqueTags() {
+  const tags = new Set();
+  tools.forEach(t => t.tags.forEach(tag => tags.add(tag)));
+  return Array.from(tags).sort();
 }
 
-function toggleAdminPanel(){
- document.getElementById('adminPanel').classList.toggle('hidden');
+function renderDropdown() {
+  const container = document.getElementById('dropdownContent');
+  container.innerHTML = '';
+  const uniqueTags = getUniqueTags();
+
+  uniqueTags.forEach(tag => {
+    const isChecked = selectedTags.includes(tag);
+    container.innerHTML += `
+      <label class="dropdown-item">
+        <input type="checkbox" value="${tag}" ${isChecked ? 'checked' : ''} onchange="handleTagChange(this)">
+        ${tag}
+      </label>
+    `;
+  });
+  updateCountText();
 }
 
-function renderAdminList(){
- const list = document.getElementById('adminList');
- list.innerHTML='';
-
- tools.forEach((tool,index)=>{
-   list.innerHTML += `
-   <div class="admin-item">
-     <div class="admin-item-top">
-       <strong>${tool.name}</strong>
-       <span>${tool.category}</span>
-     </div>
-
-     <div class="admin-actions">
-       <button class="edit-action" onclick="editTool(${index})">Editar</button>
-       <button class="delete-action" onclick="deleteTool(${index})">Eliminar</button>
-     </div>
-   </div>
-   `;
- });
+function handleTagChange(checkbox) {
+  if (checkbox.checked) {
+    selectedTags.push(checkbox.value);
+  } else {
+    selectedTags = selectedTags.filter(t => t !== checkbox.value);
+  }
+  updateCountText();
+  renderCategories();
 }
 
-function editTool(index){
- editIndex=index;
- const tool=tools[index];
-
- document.getElementById('toolName').value=tool.name;
- document.getElementById('toolUrl').value=tool.url;
- document.getElementById('toolCategory').value=tool.category;
- document.getElementById('toolTags').value=tool.tags.join(', ');
- document.getElementById('toolDescription').value=tool.description;
+function updateCountText() {
+  const label = document.getElementById('selectedCount');
+  if (selectedTags.length === 0) {
+    label.innerText = "Todas las etiquetas";
+  } else {
+    label.innerText = `${selectedTags.length} Seleccionada(s)`;
+  }
 }
 
-function persist(){
- localStorage.setItem('aihub_tools', JSON.stringify(tools));
+// RENDERIZADO PRINCIPAL DE TARJETAS
+function renderCategories() {
+  const container = document.getElementById('categoriesContainer');
+  const query = document.getElementById('search').value.toLowerCase();
+  container.innerHTML = '';
+
+  const categories = [...new Set(tools.map(t => t.category))].sort();
+
+  categories.forEach(category => {
+    const filtered = tools.filter(tool => {
+      const matchesSearch = tool.name.toLowerCase().includes(query) || tool.description.toLowerCase().includes(query);
+      const matchesTags = selectedTags.length === 0 || selectedTags.every(t => tool.tags.includes(t));
+      return tool.category === category && matchesSearch && matchesTags;
+    });
+
+    if (filtered.length === 0) return;
+
+    const block = document.createElement('div');
+    block.className = 'category-block';
+    
+    block.innerHTML = `
+      <h2 class="category-title">${category}</h2>
+      <div class="apps-grid">
+        ${filtered.map(tool => {
+          let hostname = '';
+          try { hostname = new URL(tool.url).hostname; } catch(e) { hostname = 'google.com'; }
+          return `
+            <a class="app-card" href="${tool.url}" target="_blank">
+              <div class="app-header-inline">
+                <div class="app-icon">
+                  <img src="https://www.google.com/s2/favicons?domain=${hostname}&sz=128" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5278/5278402.png'">
+                </div>
+                <div class="app-name">${tool.name}</div>
+              </div>
+              <p class="app-desc">${tool.description}</p>
+              <div class="tooltip-tags">
+                ${tool.tags.map(tag => `<span class="tooltip-tag">${tag}</span>`).join('')}
+              </div>
+            </a>
+          `;
+        }).join('')}
+      </div>
+    `;
+    container.appendChild(block);
+  });
+  renderAdminList();
 }
 
-function persist(){
- localStorage.setItem('aihub_tools', JSON.stringify(tools));
+// PANEL DE ADMINISTRACIÓN
+function toggleAdminPanel() {
+  document.getElementById('adminPanel').classList.toggle('hidden');
 }
 
-function saveTool(){
- const tool={
-   name:document.getElementById('toolName').value,
-   url:document.getElementById('toolUrl').value,
-   category:document.getElementById('toolCategory').value,
-   tags:document.getElementById('toolTags').value.split(',').map(t=>t.trim()),
-   description:document.getElementById('toolDescription').value
- };
+function renderAdminList() {
+  const list = document.getElementById('adminList');
+  list.innerHTML = '';
 
- if(editIndex===null){
-   tools.push(tool);
- } else {
-   tools[editIndex]=tool;
- }
-
- persist();
-
- editIndex=null;
- renderFilters();
- renderCategories();
+  tools.forEach((tool, index) => {
+    list.innerHTML += `
+      <div class="admin-item">
+        <div style="display:flex; justify-content:space-between; font-weight:500;">
+          <span>${tool.name}</span>
+          <span style="color:var(--muted); font-size:11px;">${tool.category}</span>
+        </div>
+        <div class="admin-actions">
+          <button class="edit-action" onclick="editTool(${index})">Editar</button>
+          <button class="delete-action" onclick="deleteTool(${index})">Eliminar</button>
+        </div>
+      </div>
+    `;
+  });
 }
 
-function deleteTool(index){
- tools.splice(index,1);
- persist();
- persist();
- renderFilters();
- renderCategories();
+function saveTool() {
+  const name = document.getElementById('toolName').value.trim();
+  const url = document.getElementById('toolUrl').value.trim();
+  const category = document.getElementById('toolCategory').value.trim();
+  const tagsStr = document.getElementById('toolTags').value;
+  const description = document.getElementById('toolDescription').value.trim();
+
+  if(!name || !url || !category) return alert("Por favor rellena Nombre, URL y Categoría.");
+
+  const tool = {
+    name,
+    url,
+    category,
+    tags: tagsStr.split(',').map(t => t.trim()).filter(t => t !== ""),
+    description
+  };
+
+  if (editIndex === null) {
+    tools.push(tool);
+  } else {
+    tools[editIndex] = tool;
+    editIndex = null;
+  }
+
+  localStorage.setItem('aihub_tools', JSON.stringify(tools));
+  
+  // Limpiar formulario
+  document.getElementById('toolName').value = '';
+  document.getElementById('toolUrl').value = '';
+  document.getElementById('toolCategory').value = '';
+  document.getElementById('toolTags').value = '';
+  document.getElementById('toolDescription').value = '';
+
+  renderDropdown();
+  renderCategories();
+}
+
+function editTool(index) {
+  editIndex = index;
+  const tool = tools[index];
+  document.getElementById('toolName').value = tool.name;
+  document.getElementById('toolUrl').value = tool.url;
+  document.getElementById('toolCategory').value = tool.category;
+  document.getElementById('toolTags').value = tool.tags.join(', ');
+  document.getElementById('toolDescription').value = tool.description;
+  document.querySelector('.admin-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+function deleteTool(index) {
+  if(confirm("¿Eliminar herramienta?")) {
+    tools.splice(index, 1);
+    localStorage.setItem('aihub_tools', JSON.stringify(tools));
+    renderDropdown();
+    renderCategories();
+  }
 }
 
 document.getElementById('search').addEventListener('input', renderCategories);
 
-function dragStart(event,index){
- draggedIndex=index;
-}
-
-function allowDrop(event){
- event.preventDefault();
-}
-
-function dropCard(event,newCategory){
- event.preventDefault();
- if(draggedIndex===null) return;
- tools[draggedIndex].category = newCategory;
- persist();
- renderCategories();
- renderFilters();
-}
-
-renderFilters();
+// ARRANCAR APLICACIÓN
+renderDropdown();
 renderCategories();
 </script>
 </body>
