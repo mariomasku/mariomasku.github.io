@@ -55,7 +55,12 @@
     }
 
     body.modal-open {
-      overflow: hidden;
+      overflow: hidden; /* Bloquea el scroll principal */
+    }
+
+    /* CLASE CRÍTICA DE CONTROL DE VISIBILIDAD */
+    .hidden {
+      display: none !important;
     }
 
     .layout {
@@ -126,7 +131,7 @@
       margin-bottom: 10px;
     }
 
-    /* CONTENEDOR DE ETIQUETAS MAXIMIZADO */
+    /* CONTENEDOR DE ETIQUETAS */
     .tags-scroll-container {
       flex: 1;
       background: var(--input-bg);
@@ -146,7 +151,6 @@
       border-radius: 6px;
     }
     .tag-checkbox-item:hover { background: var(--card-hover); }
-    .tag-checkbox-item input { cursor: pointer; }
 
     .sidebar-footer {
       display: flex;
@@ -183,29 +187,35 @@
 
     .category-block {
       margin-bottom: 32px;
-      padding: 10px;
+      padding: 14px;
+      border: 2px solid transparent;
       border-radius: 12px;
     }
     
+    /* Feedback visual al arrastrar categorías */
     .category-block.drag-over-cat {
-      border: 2px dashed var(--accent);
-      background: rgba(79, 70, 229, 0.05);
+      border-color: var(--accent);
+      background: rgba(79, 70, 229, 0.04);
     }
 
     .category-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       margin-bottom: 16px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: grab;
+      user-select: none;
+      padding: 4px 8px;
+      border-radius: 6px;
     }
+    .category-title:active { cursor: grabbing; background: var(--input-bg); }
     .category-title::before {
       content: "⋮⋮";
       color: var(--muted);
-      font-size: 14px;
-      opacity: 0.5;
+      font-size: 13px;
+      opacity: 0.6;
     }
 
     /* REJILLA ULTRA COMPACTA */
@@ -213,7 +223,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 12px;
-      min-height: 50px;
+      min-height: 60px; /* Margen para poder soltar tarjetas en bloques vacíos */
     }
 
     .app-card {
@@ -226,11 +236,10 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      position: relative;
       box-shadow: 0 2px 6px var(--shadow);
       cursor: grab;
     }
-    .app-card:active { cursor: grabbing; }
+    .app-card:active { cursor: grabbing; opacity: 0.5; }
     .app-card:hover {
       transform: translateY(-1px);
       background: var(--card-hover);
@@ -238,8 +247,8 @@
     }
 
     .app-icon {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 8px;
       background: #fff;
       display: flex;
@@ -248,17 +257,17 @@
       border: 1px solid var(--border);
       flex-shrink: 0;
     }
-    .app-icon img { width: 24px; height: 24px; object-fit: contain; }
+    .app-icon img { width: 22px; height: 22px; object-fit: contain; }
 
     .app-info {
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
     }
 
-    .app-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .app-desc { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .app-name { font-weight: 600; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .app-desc { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* MODAL DE ADMINISTRACIÓN CENTRADO */
     .modal-overlay {
@@ -267,8 +276,8 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -318,7 +327,7 @@
     }
     .admin-form input:focus, .admin-form textarea:focus { border-color: var(--accent); }
 
-    /* LISTA INTERNA CON SCROLL DE HERRAMIENTAS */
+    /* LISTA DE EDICIÓN INTERNA */
     .admin-list-container {
       border-top: 1px solid var(--border);
       padding-top: 15px;
@@ -398,7 +407,7 @@
   <div class="admin-modal" onclick="event.stopPropagation()">
     <div class="modal-header">
       <h2>Panel de Administración</h2>
-      <button class="btn-action" style="width:auto; padding:6px 12px; border-radius:6px;" onclick="closeAdminPanel()">✕</button>
+      <button class="btn-action" style="width:auto; padding:6px 12px; border-radius:6px;" onclick="closeAdminPanel()">✕ Cerrar</button>
     </div>
     
     <div class="modal-body">
@@ -420,7 +429,7 @@
 </div>
 
 <script>
-// BASE DE DATOS LOCAL CON LOS 44 ENLACES ORIGINALES TRADUCIDOS Y CORREGIDOS
+// BASE DE DATOS LOCAL NATIVA CON LOS 44 REGISTROS COMPLETOS
 let tools = JSON.parse(localStorage.getItem('aihub_tools')) || [
   {id: 1, name:'ChatGPT',url:'https://chat.openai.com/chat',category:'Chat IA',tags:['LLM','Multimodal','Productividad'],description:'Asistente multimodal generalista para razonamiento, programación y creación de contenido.'},
   {id: 2, name:'Claude',url:'https://claude.ai/new',category:'Desarrollo',tags:['LLM','Coding','Artifacts','Reasoning'],description:'Modelo frontier especialmente fuerte en programación, razonamiento avanzado y textos largos.'},
@@ -468,29 +477,28 @@ let tools = JSON.parse(localStorage.getItem('aihub_tools')) || [
   {id: 44, name:'v0 Chat',url:'https://v0.dev/chat',category:'Desarrollo',tags:['Frontend','Chat UI'],description:'Entorno conversacional de v0 para generación iterativa de interfaces.'}
 ];
 
-// ORDEN DE LAS CATEGORÍAS (Persistido)
+// PERSISTENCIA DEL ORDEN DE CATEGORÍAS
 let categoryOrder = JSON.parse(localStorage.getItem('aihub_category_order')) || [];
 
 let selectedTags = [];
 let editIndex = null;
 
-let dragType = null; 
+// CONTROL DE ESTADO GLOBAL PARA DRAG & DROP
+let dragType = null; // 'card' o 'category'
+let draggedCardId = null;
 let draggedCategoryName = null;
 
-// CAMBIO DE TEMA CLARO/OSCURO
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
   document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
 }
 
-// OBTENER TODAS LAS ETIQUETAS UNIFICADAS
 function getUniqueTags() {
   const tags = new Set();
   tools.forEach(t => { if(t.tags) t.tags.forEach(tag => tags.add(tag)); });
   return Array.from(tags).sort();
 }
 
-// RENDERIZAR PANEL LATERAL DE CHECKBOXES
 function renderTagsMenu() {
   const container = document.getElementById('tagsContainer');
   container.innerHTML = '';
@@ -516,7 +524,6 @@ function handleTagFilterChange(checkbox) {
   renderCategories();
 }
 
-// COMPROBAR Y SINCRONIZAR ARREGLO DE CATEGORÍAS
 function syncCategoryOrder() {
   const currentCategories = [...new Set(tools.map(t => t.category))];
   categoryOrder = categoryOrder.filter(c => currentCategories.includes(c));
@@ -526,14 +533,14 @@ function syncCategoryOrder() {
   localStorage.setItem('aihub_category_order', JSON.stringify(categoryOrder));
 }
 
-// RENDERIZADO PRINCIPAL (GRID COMPACTA SIN ETIQUETAS VISIBLES)
+// RENDERIZADO PRINCIPAL CON LOS LISTENERS DE ARRASTRE SEPARADOS
 function renderCategories() {
   syncCategoryOrder();
   const container = document.getElementById('categoriesContainer');
   const query = document.getElementById('search').value.toLowerCase();
   container.innerHTML = '';
 
-  categoryOrder.forEach((category, catIndex) => {
+  categoryOrder.forEach((category) => {
     const filteredTools = tools.filter(tool => {
       if (tool.category !== category) return false;
       const matchesSearch = tool.name.toLowerCase().includes(query) || tool.description.toLowerCase().includes(query);
@@ -547,24 +554,21 @@ function renderCategories() {
     block.className = 'category-block';
     block.setAttribute('data-catname', category);
     
-    block.setAttribute('draggable', 'true');
-    block.addEventListener('dragstart', (e) => handleCategoryDragStart(e, category));
-    block.addEventListener('dragover', (e) => handleCategoryDragOver(e, block));
+    // El bloque entero escucha el dragover/drop para saber si le cae una categoría o una tarjeta
+    block.addEventListener('dragover', (e) => handleBlockDragOver(e, block));
     block.addEventListener('dragleave', () => block.classList.remove('drag-over-cat'));
-    block.addEventListener('drop', (e) => handleCategoryDrop(e, category));
+    block.addEventListener('drop', (e) => handleBlockDrop(e, category));
 
     block.innerHTML = `
-      <h2 class="category-title">${category}</h2>
+      <h2 class="category-title" draggable="true">${category}</h2>
       <div class="apps-grid" data-gridcat="${category}">
-        ${filteredTools.map((tool, index) => {
+        ${filteredTools.map((tool) => {
           let hostname = '';
           try { hostname = new URL(tool.url).hostname; } catch(e) { hostname = 'google.com'; }
-          const toolId = tool.id || `${category}-${index}`;
-          
           return `
             <a class="app-card" href="${tool.url}" target="_blank" title="${tool.description}"
                draggable="true" 
-               data-toolid="${toolId}"
+               data-toolid="${tool.id}"
                data-toolcat="${category}">
               <div class="app-icon">
                 <img src="https://www.google.com/s2/favicons?domain=${hostname}&sz=128" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5278/5278402.png'">
@@ -579,10 +583,16 @@ function renderCategories() {
       </div>
     `;
 
+    // Asignar eventos de arrastre al TÍTULO (Para mover categorías)
+    const titleElem = block.querySelector('.category-title');
+    titleElem.addEventListener('dragstart', (e) => handleCategoryDragStart(e, category));
+
+    // Asignar eventos de arrastre a las TARJETAS (Para mover registros)
     block.querySelectorAll('.app-card').forEach(card => {
-      card.addEventListener('dragstart', (e) => handleCardDragStart(e, card));
+      const cardId = card.getAttribute('data-toolid');
+      card.addEventListener('dragstart', (e) => handleCardDragStart(e, cardId));
       card.addEventListener('dragover', (e) => e.preventDefault());
-      card.addEventListener('drop', (e) => handleCardDrop(e, card));
+      card.addEventListener('drop', (e) => handleCardDrop(e, cardId, category));
     });
 
     container.appendChild(block);
@@ -591,72 +601,32 @@ function renderCategories() {
   renderAdminList();
 }
 
-// DRAG & DROP: CATEGORÍAS
-function handleCategoryDragStart(e, categoryName) {
-  dragType = 'category';
-  draggedCategoryName = categoryName;
-  e.stopPropagation();
-}
+/* ================= LÓGICA DE DRAG & DROP SEPARADA INTERNA ================= */
 
-function handleCategoryDragOver(e, block) {
-  if (dragType === 'category') {
-    e.preventDefault();
-    block.classList.add('drag-over-cat');
-  } else if (dragType === 'card') {
-    e.preventDefault();
-  }
-}
-
-function handleCategoryDrop(e, targetCategory) {
-  e.preventDefault();
-  e.stopPropagation();
-  
-  if (dragType === 'category' && draggedCategoryName !== targetCategory) {
-    const fromIndex = categoryOrder.indexOf(draggedCategoryName);
-    const toIndex = categoryOrder.indexOf(targetCategory);
-    categoryOrder.splice(fromIndex, 1);
-    categoryOrder.splice(toIndex, 0, draggedCategoryName);
-    localStorage.setItem('aihub_category_order', JSON.stringify(categoryOrder));
-    renderCategories();
-  } else if (dragType === 'card') {
-    const toolId = e.dataTransfer.getData('text/plain');
-    const toolIndex = tools.findIndex(t => (t.id && t.id.toString() === toolId) || (!t.id && t.name === toolId));
-    if(toolIndex > -1 && tools[toolIndex].category !== targetCategory) {
-      tools[toolIndex].category = targetCategory;
-      localStorage.setItem('aihub_tools', JSON.stringify(tools));
-      renderCategories();
-    }
-  }
-  document.querySelectorAll('.category-block').forEach(b => b.classList.remove('drag-over-cat'));
-}
-
-// DRAG & DROP: TARJETAS (HERRAMIENTAS)
-function handleCardDragStart(e, card) {
+// Al iniciar el arrastre de una tarjeta
+function handleCardDragStart(e, toolId) {
   dragType = 'card';
-  const toolId = card.getAttribute('data-toolid');
+  draggedCardId = toolId;
   e.dataTransfer.setData('text/plain', toolId);
   e.stopPropagation();
 }
 
-function handleCardDrop(e, targetCard) {
+// Al soltar una tarjeta encima de OTRA tarjeta
+function handleCardDrop(e, targetToolId, targetCategory) {
   e.preventDefault();
   e.stopPropagation();
 
   if (dragType !== 'card') return;
 
-  const draggedId = e.dataTransfer.getData('text/plain');
-  const targetId = targetCard.getAttribute('data-toolid');
-  const targetCat = targetCard.getAttribute('data-toolcat');
-
-  const fromIndex = tools.findIndex(t => (t.id && t.id.toString() === draggedId) || (!t.id && t.name === draggedId));
-  const toIndex = tools.findIndex(t => (t.id && t.id.toString() === targetId) || (!t.id && t.name === targetId));
+  const fromIndex = tools.findIndex(t => t.id.toString() === draggedCardId.toString());
+  const toIndex = tools.findIndex(t => t.id.toString() === targetToolId.toString());
 
   if (fromIndex > -1 && toIndex > -1 && fromIndex !== toIndex) {
     const draggedItem = tools[fromIndex];
-    draggedItem.category = targetCat;
-    
+    draggedItem.category = targetCategory; // Transfiere de categoría automáticamente si cambia de bloque
+
     tools.splice(fromIndex, 1);
-    const newToIndex = tools.findIndex(t => (t.id && t.id.toString() === targetId) || (!t.id && t.name === targetId));
+    const newToIndex = tools.findIndex(t => t.id.toString() === targetToolId.toString());
     tools.splice(newToIndex, 0, draggedItem);
 
     localStorage.setItem('aihub_tools', JSON.stringify(tools));
@@ -664,7 +634,52 @@ function handleCardDrop(e, targetCard) {
   }
 }
 
-// MODAL: GESTIÓN DE APERTURA Y CIERRE
+// Al iniciar el arrastre de una Categoría (Desde su título handle)
+function handleCategoryDragStart(e, categoryName) {
+  dragType = 'category';
+  draggedCategoryName = categoryName;
+  e.stopPropagation();
+}
+
+function handleBlockDragOver(e, blockElement) {
+  e.preventDefault();
+  if (dragType === 'category') {
+    blockElement.classList.add('drag-over-cat');
+  }
+}
+
+// Al soltar elementos en el contenedor general del bloque de categoría
+function handleBlockDrop(e, targetCategoryName) {
+  e.preventDefault();
+  
+  if (dragType === 'category') {
+    if (draggedCategoryName !== targetCategoryName) {
+      const fromIndex = categoryOrder.indexOf(draggedCategoryName);
+      const toIndex = categoryOrder.indexOf(targetCategoryName);
+      
+      if (fromIndex > -1 && toIndex > -1) {
+        categoryOrder.splice(fromIndex, 1);
+        categoryOrder.splice(toIndex, 0, draggedCategoryName);
+        localStorage.setItem('aihub_category_order', JSON.stringify(categoryOrder));
+        renderCategories();
+      }
+    }
+  } else if (dragType === 'card') {
+    // Si la tarjeta cae en una zona vacía del bloque o sobre una rejilla sin items
+    const fromIndex = tools.findIndex(t => t.id.toString() === draggedCardId.toString());
+    if (fromIndex > -1) {
+      const draggedItem = tools[fromIndex];
+      if (draggedItem.category !== targetCategoryName) {
+        draggedItem.category = targetCategoryName;
+        localStorage.setItem('aihub_tools', JSON.stringify(tools));
+        renderCategories();
+      }
+    }
+  }
+  document.querySelectorAll('.category-block').forEach(b => b.classList.remove('drag-over-cat'));
+}
+
+/* ================= CONTROL DE MODAL CENTRALIZADO ================= */
 function openAdminPanel() {
   document.getElementById('modalOverlay').classList.remove('hidden');
   document.body.classList.add('modal-open');
@@ -681,7 +696,6 @@ function closeAdminPanelOutside(e) {
   closeAdminPanel();
 }
 
-// RENDERIZAR LISTA DE EDICIÓN INTERNA CON SCROLL
 function renderAdminList() {
   const list = document.getElementById('adminScrollList');
   list.innerHTML = '';
@@ -702,7 +716,6 @@ function renderAdminList() {
   });
 }
 
-// GUARDAR REGISTROS
 function saveTool() {
   const name = document.getElementById('toolName').value.trim();
   const url = document.getElementById('toolUrl').value.trim();
@@ -761,7 +774,12 @@ function deleteTool(index) {
 
 document.getElementById('search').addEventListener('input', renderCategories);
 
-// ARRANCAR APLICACIÓN
+// RESET INICIAL LIMPIO DE CACHÉ VIEJA DE LA SESIÓN ANTERIOR (Opcional, para forzar los 44)
+if(!localStorage.getItem('aihub_tools') || JSON.parse(localStorage.getItem('aihub_tools')).length < 20) {
+  localStorage.setItem('aihub_tools', JSON.stringify(tools));
+}
+
+// INICIALIZACIÓN
 renderTagsMenu();
 renderCategories();
 </script>
